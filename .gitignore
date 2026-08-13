@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.py[cod]
+.venv/
+venv/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Chainlit generates this locally on first run
+.chainlit/
+.files/
+
+# OS
+.DS_Store
+
+# If you ever add a Docker build cache or local db dump
+*.db
+
+# IDE
+.vscode/
+.idea/
