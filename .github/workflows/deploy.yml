@@ -15,8 +15,8 @@ jobs:
 
       - name: Validate commit messages
         run: |
-          COMMITS=$(git log --format=%s origin/${{ github.base_ref }}..HEAD)
-
+          COMMITS=$(git log --no-merges --format=%s origin/${{ github.base_ref }}..HEAD)
+          
           while IFS= read -r COMMIT; do
             if [[ "$COMMIT" =~ ^(feat|fix|test|docs|chore|refactor)(\(.+\))?:\ .+ ]]; then
               echo "Valid commit: $COMMIT"
