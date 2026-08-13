@@ -44,7 +44,7 @@ alfafocus-pilot/
 
 ### Layer overview
 
-- **`routes/`** — thin HTTP handlers. Each route renders a template or delegates to `services/`/`rag/` — no business logic lives here directly.
+- **`routes/`** — HTTP handlers. Each route renders a template or delegates to `services/`/`rag/` — no business logic lives here directly.
 - **`chainlit/`** — the chat interface. `on_message` is where a user's question enters the RAG pipeline via `rag/`.
 - **`services/`** — logic that isn't HTTP- or chat-specific: document lifecycle and file storage. Keeps `routes/` from growing bloated handlers.
 - **`rag/`** — the retrieval-augmented generation pipeline itself, split by responsibility (embed → retrieve → generate) so each piece can be tested and swapped independently.
@@ -83,4 +83,3 @@ Notes:
 - If you run Uvicorn from inside the `app/` folder instead, the module path becomes `main:app` (example: `cd app && uvicorn main:app --reload`).
 - If `uvicorn` isn't on your PATH use the venv binary: `./.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`.
 - For production, run Uvicorn behind a reverse proxy (nginx) or use a process manager; avoid running as root on privileged ports.
-
