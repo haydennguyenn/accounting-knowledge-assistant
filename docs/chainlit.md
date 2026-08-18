@@ -1,14 +1,9 @@
-# Welcome to Chainlit! 🚀🤖
+# Alfa Focus Knowledge Assistant
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
+Ask about SMSF compliance, superannuation law, or how we do things here.
 
-## Useful Links 🔗
+- Every answer cites its sources. Open them.
+- Answers are scoped to an income year - check it matches your fund.
+- No client names, TFNs or member numbers. Ask the rules question instead.
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
-
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
-
-## Welcome screen
-
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+This assists your judgement. It does not replace your sign-off.
