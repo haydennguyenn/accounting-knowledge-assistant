@@ -96,6 +96,14 @@ pgvector was the right call for this domain specifically: one query can filter o
 
 ## Run mounted FastAPI + Chainlit app
 
+### First Time
+MacOS/Linux
+```bash
+python -m venv .venv
+pip install -r requirements.txt
+```
+
+### To Start
 Chainlit is mounted into the FastAPI app (see `app/main.py`), so the chat UI is available under `/chat` on the FastAPI server. From the repository root:
 
 - Local only (recommended for development):
