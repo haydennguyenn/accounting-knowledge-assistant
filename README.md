@@ -99,7 +99,7 @@ pgvector was the right call for this domain specifically: one query can filter o
 ### First Time
 MacOS/Linux
 ```bash
-python -m venv .venv
+python3.13.9 -m venv .venv
 pip install -r requirements.txt
 ```
 
