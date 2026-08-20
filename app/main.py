@@ -1,15 +1,18 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from chainlit.utils import mount_chainlit
+from fastapi.templating import Jinja2Templates
 
 from app.routes.upload import router as upload_router
 from app.routes.testing import router as testing_router
+from app.routes.home import router as home_router
 
 app = FastAPI()
 
 # Routers for file upload and LLM testing endpoints
 app.include_router(upload_router)
 app.include_router(testing_router)
+app.include_router(home_router)
 
 @app.get("/")
 def root():
