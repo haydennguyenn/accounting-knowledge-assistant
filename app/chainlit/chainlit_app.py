@@ -4,11 +4,16 @@ from app.rag.generator import generate_response
 @cl.on_chat_start
 async def start():
     await cl.Message(
+<<<<<<< Updated upstream
         content="# Alfa Focus Knowledge Assistant\nWelcome! Ask me any accounting or business question."
+=======
+        content="# Alfa Focus Knowledge Assistant\nWelcome! Ask me any question."
+>>>>>>> Stashed changes
     ).send()
 
 @cl.on_message
 async def on_message(message: cl.Message):
+<<<<<<< Updated upstream
     
     msg = cl.Message(content="")
     await msg.send()
@@ -22,3 +27,12 @@ async def on_message(message: cl.Message):
 
     
     await msg.update()
+=======
+   
+    try:
+        reply_text = generate_response(message.content)
+    except Exception as e:
+        reply_text = f"Error generating response: {str(e)}"
+
+    await cl.Message(content=reply_text).send()
+>>>>>>> Stashed changes
