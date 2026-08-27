@@ -59,7 +59,7 @@ accounting-knowledge-assistant/
 │ │
 │ ├── rag/
 │ │ ├── embedder.py         # Text → vector embeddings
-│ │ ├── retriever.py        # Hybrid search + temporal filter + corpus routing + rerank
+│ │ ├── retriever.py        # 
 │ │ └── generator.py        # Prompt assembly + LLM call + citation validation
 │ │
 │ └── db/
@@ -94,7 +94,7 @@ Postgres + pgvector via Supabase, provisioned separately from Render so data per
 
 pgvector was the right call for this domain specifically: one query can filter on effective dates, match exact statutory identifiers via a generated `tsvector`, and rank by vector distance — no second search system to run.
 
-## Run mounted FastAPI + Chainlit app
+## Run mounted FastAPI + Chainlit app locally
 
 ### First Time
 MacOS/Linux
