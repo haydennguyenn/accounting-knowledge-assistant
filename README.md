@@ -27,6 +27,7 @@ Read in this order. Each is written to be read on its own, but the design decisi
 | [`docs/EVALUATION.md`](docs/EVALUATION.md) | Benchmark taxonomy, 28 seed questions, metrics and gates, LLM-judge design, what `/testing` must do |
 | [`docs/CLIENT-MEETING-QUESTIONS.md`](docs/CLIENT-MEETING-QUESTIONS.md) | The 14 questions that change the build, ranked |
 | [`docs/GIT-WORKFLOW.md`](docs/GIT-WORKFLOW.md) | Branch naming, commit format, PR and CI requirements |
+| [`docs/DATABASE.md`](docs/DATABASE.md) | PostgreSQL + pgvector setup, BGE-M3 embeddings, schema reference, connection guide |
 
 ## Design principles
 
@@ -58,8 +59,8 @@ accounting-knowledge-assistant/
 │ │ └── storage_service.py  # Supabase Storage: upload/fetch raw files
 │ │
 │ ├── rag/
-│ │ ├── embedder.py         # Text → vector embeddings
-│ │ ├── retriever.py        # 
+│ │ ├── embedder.py         # Text → vector embeddings (BGE-M3 via Hugging Face)
+│ │ ├── retriever.py        # Hybrid search: vector
 │ │ └── generator.py        # Prompt assembly + LLM call + citation validation
 │ │
 │ └── db/
@@ -70,13 +71,15 @@ accounting-knowledge-assistant/
 ├── benchmarks/
 │   └── questions.jsonl     # Versioned benchmark set — see docs/EVALUATION.md
 │
+├── tests/                  # Test scripts for database, embeddings, and connections
+│
 ├── templates/              # Jinja2 templates for /upload and /testing
 ├── static/                 # Shared CSS and minimal client-side JS
 ├── docs/                   # See the documentation table above
 │
 ├── .env.example            # Documents every required env var, no real values
 ├── Dockerfile
-├── requirements.txt        # Pinned to versions Chainlit actually supports
+├── requirements.txt        # Pinned dependencies (Chainlit, pgvector, sentence-transformers)
 └── README.md
 ```
 
@@ -90,47 +93,108 @@ accounting-knowledge-assistant/
 
 ### Database
 
-Postgres + pgvector via Supabase, provisioned separately from Render so data persists independently of the app container. Two Supabase projects — one dev, one prod — matching the free tier's two-project allowance. `DATABASE_URL` in `.env` (dev) or Render's dashboard (prod) determines which one the app talks to.
+**Postgres 14+ with pgvector** hosted on **Supabase**. The free tier provides 500MB database storage and 1GB file storage — sufficient for ~1,400 documents with embeddings.
 
-pgvector was the right call for this domain specifically: one query can filter on effective dates, match exact statutory identifiers via a generated `tsvector`, and rank by vector distance — no second search system to run.
+**Why Supabase + pgvector?**
+- Single system for metadata filtering, full-text search, and vector similarity
+- One SQL query can filter by effective dates, match statutory identifiers, and rank by semantic distance
+- No sync lag between separate vector and metadata stores
+- Free tier includes automatic backups and point-in-time recovery
 
-## Run mounted FastAPI + Chainlit app locally
+- **Dev**: Local development, seeded with test documents (`SUPABASE_DB_URL` in `.env`)
 
-### First Time
-MacOS/Linux
+See [`docs/DATABASE.md`](docs/DATABASE.md) for schema details, connection setup, and BGE-M3 embedding integration.
+
+## Local Development Setup
+
+### Prerequisites
+
+- Python 3.13+ (macOS/Linux)
+- Active Supabase project with connection string
+- Hugging Face account with API token
+
+### Initial Setup
+
+1. **Create virtual environment and install dependencies:**
+
 ```bash
 python3.13 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### To Start
-Chainlit is mounted into the FastAPI app (see `app/main.py`), so the chat UI is available under `/chat` on the FastAPI server. From the repository root:
+2. **Configure environment variables:**
 
-- Local only (recommended for development):
+Copy `.env.example` to `.env` and fill in your credentials:
 
+```bash
+cp .env.example .env
+```
+
+Required variables:
+```bash
+# Database
+SUPABASE_DB_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
+
+# Embedding model
+HF_TOKEN=hf_your_token_here
+
+# LLM providers (choose one or both)
+GEMINI_API_KEY=your_gemini_key
+GEMINI_MODEL=gemini-2.5-flash
+
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=openai/gpt-oss-120b
+```
+
+See [`.env.example`](.env.example) for all variables and [`docs/DATABASE.md`](docs/DATABASE.md) for database setup.
+
+### Running the Application
+
+Chainlit is mounted into FastAPI at `/chat` (see `app/main.py`). Start the server from the repository root:
+
+**Development (local access only):**
 ```bash
 source .venv/bin/activate
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-- Expose on LAN (other devices on same network can reach it):
-
+**LAN access (testing from other devices):**
 ```bash
 source .venv/bin/activate
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Then open the chat UI at:
+### Access the Application
 
-```text
-http://localhost:8000/chat        # local-only
-http://<your-machine-ip>:8000/chat # from another device on LAN
-```
+| Endpoint | URL | Description |
+|----------|-----|-------------|
+| Chat interface | `http://localhost:8000/chat` | Main Chainlit UI |
+| Document upload | `http://localhost:8000/upload` | Bulk document ingestion |
+| Evaluation | `http://localhost:8000/testing` | Benchmark runner |
+| API docs | `http://localhost:8000/docs` | FastAPI Swagger UI |
 
-Notes:
-- If you run Uvicorn from inside the `app/` folder instead, the module path becomes `main:app` (example: `cd app && uvicorn main:app --reload`).
-- If `uvicorn` isn't on your PATH use the venv binary: `./.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`.
-- For production, run Uvicorn behind a reverse proxy (nginx) or use a process manager; avoid running as root on privileged ports.
+For LAN access, replace `localhost` with your machine's local IP address.
+
+### Troubleshooting
+
+**"Module not found: app"**
+- Ensure you're running from the project root, not inside `app/`
+- Use `python -m` syntax: `python -m app.main` or specify the full module path: `uvicorn app.main:app`
+
+**"uvicorn: command not found"**
+- Activate the virtual environment: `source .venv/bin/activate`
+- Or use the direct path: `./.venv/bin/uvicorn app.main:app --reload`
+
+**Database connection errors**
+- Verify `SUPABASE_DB_URL` in `.env` matches your Supabase dashboard
+- Check that pgvector extension is enabled (see [`docs/DATABASE.md`](docs/DATABASE.md))
+- Supabase pauses inactive projects after 7 days — wake it by visiting the dashboard
+
+**Production deployment:**
+- Run Uvicorn behind a reverse proxy (nginx)
+- Use a process manager (systemd, supervisord)
+- Never run as root or bind to privileged ports directly
 
 ## Contributing
 
@@ -147,6 +211,7 @@ Tracked here so nobody assumes they work:
 
 - `Dockerfile` is empty — Render deployment cannot succeed until it is written, and no CI check catches this.
 - `.github/workflows/deploy.yml` does not deploy. It contains a commit-message check. Rename it to `commit-message.yml` or make it deploy.
-- `app/db/models.py` and `app/db/schema.sql` are empty — proposed contents in [`docs/RAG-DESIGN.md`](docs/RAG-DESIGN.md) section 4.
-- `mlflow` is not in `requirements.txt`; the evaluation design in [`docs/EVALUATION.md`](docs/EVALUATION.md) assumes it.
+- `app/rag/embedder.py` is empty — BGE-M3 embedding implementation pending (see [`docs/DATABASE.md`](docs/DATABASE.md) for integration guide).
+- `app/rag/retriever.py` and `app/rag/generator.py` are incomplete — RAG pipeline scaffolded but not functional.
+- `mlflow` is not in `requirements.txt` — the evaluation design in [`docs/EVALUATION.md`](docs/EVALUATION.md) assumes it.
 - `ci.yml` has a commented-out `pytest` step — that is where the evaluation gates hook in.
