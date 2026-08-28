@@ -4,81 +4,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Accounting Digital Assistant - Documents</title>
-        <!-- 使用 Inter 字体和 FontAwesome 图标库，复刻 UI -->
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <style>
-            /* 基础重置 */
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #111827; height: 100vh; display: flex; }
-            
-            /* 侧边栏 */
-            .sidebar { width: 260px; background-color: #f8fafc; border-right: 1px solid #e5e7eb; padding: 24px 16px; display: flex; flex-direction: column; height: 100vh; position: fixed; }
-            .logo { font-weight: 700; font-size: 18px; color: #1f2937; margin-bottom: 32px; }
-            .new-chat-btn { width: 100%; background-color: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 32px; transition: 0.2s; }
-            .new-chat-btn:hover { background-color: #1d4ed8; }
-            
-            .sidebar-section { margin-bottom: 24px; }
-            .sidebar-title { font-size: 12px; color: #6b7280; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-            .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: #4b5563; text-decoration: none; border-radius: 6px; font-size: 14px; cursor: pointer; transition: 0.2s; margin-bottom: 4px; }
-            .sidebar-item:hover { background-color: #e5e7eb; }
-            .sidebar-item.active { background-color: #e0e7ff; color: #4338ca; font-weight: 500; }
-            
-            .sidebar-footer { margin-top: auto; }
-            .settings-btn { display: flex; align-items: center; gap: 12px; color: #4b5563; font-size: 14px; cursor: pointer; padding: 10px 0; }
-            .version-text { font-size: 12px; color: #9ca3af; margin-top: 16px; }
-
-            /* 主内容区域 */
-            .main-content { margin-left: 260px; flex: 1; padding: 32px 48px; width: calc(100% - 260px); }
-            
-            /* 顶部栏 */
-            .header { display: flex; justify-content: flex-end; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; }
-            .badge { border: 1px solid #e5e7eb; padding: 6px 16px; border-radius: 20px; font-size: 13px; color: #4b5563; background: white; }
-
-            /* 页面标题 */
-            .page-title { font-size: 28px; font-weight: 600; color: #111827; margin-bottom: 8px; }
-            .page-subtitle { color: #6b7280; font-size: 14px; margin-bottom: 32px; }
-
-            /* 上传区域 */
-            .upload-zone { background-color: #f9fafb; border: 2px dashed #d1d5db; border-radius: 12px; padding: 48px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 48px; transition: 0.2s; }
-            .upload-zone:hover { background-color: #f3f4f6; border-color: #9ca3af; }
-            .upload-icon { font-size: 40px; color: #2563eb; margin-bottom: 16px; }
-            .upload-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-            .upload-desc { color: #6b7280; font-size: 14px; margin-bottom: 24px; }
-            .browse-btn { background-color: #2563eb; color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 14px; transition: 0.2s; }
-            .browse-btn:hover { background-color: #1d4ed8; }
-            .file-types { color: #9ca3af; font-size: 12px; margin-top: 16px; }
-
-            /* 文件列表区域 */
-            .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-            .list-title { font-size: 20px; font-weight: 600; }
-            .search-box { position: relative; }
-            .search-box input { padding: 8px 12px 8px 36px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 250px; outline: none; }
-            .search-box input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-            .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
-
-            .table-container { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
-            table { width: 100%; border-collapse: collapse; text-align: left; }
-            th { background-color: #f9fafb; padding: 16px 20px; font-weight: 600; font-size: 12px; color: #6b7280; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
-            td { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #111827; vertical-align: middle; }
-            tr:last-child td { border-bottom: none; }
-
-            /* 文件图标和名称 */
-            .file-info { display: flex; align-items: center; gap: 12px; }
-            .file-icon { width: 40px; height: 40px; background-color: #eef2ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #4338ca; font-weight: 700; font-size: 10px; text-transform: uppercase; }
-            .file-icon.docx { background-color: #e0f2fe; color: #0369a1; }
-            .file-name { font-weight: 500; }
-            .file-sub { display: block; font-weight: 400; color: #6b7280; font-size: 12px; margin-top: 2px; }
-
-            /* 状态标签 */
-            .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
-            .status-badge.processed { background-color: #dcfce7; color: #166534; }
-            .status-badge.uploaded { background-color: #e0e7ff; color: #4338ca; }
-
-            /* 操作按钮 */
-            .action-btn { background: transparent; border: 1px solid #e5e7eb; border-radius: 6px; padding: 4px 8px; cursor: pointer; color: #6b7280; }
-            .action-btn:hover { background-color: #f3f4f6; }
-        </style>
+        <link rel="stylesheet" href="static/css/style.css">
     </head>
     <body>
 
