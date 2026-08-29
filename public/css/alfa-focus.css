@@ -1,0 +1,300 @@
+/* ============================================
+   Alfa Focus SMSF Assistant - custom css
+   ============================================ */
+
+:root {
+    /* 品牌色 */
+    --alfa-primary: #2563eb;
+    --alfa-primary-light: #3b82f6;
+    --alfa-primary-dark: #1d4ed8;
+    --alfa-bg: #f8fafc;
+    --alfa-card-bg: #ffffff;
+    --alfa-border: #e2e8f0;
+    --alfa-text: #1e293b;
+    --alfa-text-muted: #64748b;
+    --alfa-warning-bg: #fef3c7;
+    --alfa-warning-border: #f59e0b;
+    --alfa-success-bg: #dcfce7;
+    --alfa-success-border: #22c55e;
+}
+
+/* ========== all ========== */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--alfa-bg);
+    color: var(--alfa-text);
+}
+
+/* ========== Header ========== */
+#header {
+    border-bottom: 1px solid var(--alfa-border);
+    background: var(--alfa-card-bg);
+    padding: 12px 24px;
+    height: 64px;
+}
+
+#header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--alfa-text);
+}
+
+/* new chat button */
+#new-chat-button {
+    background: var(--alfa-primary);
+    color: white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#new-chat-button:hover {
+    background: var(--alfa-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* ========== sidebar ========== */
+/* Chainlit sidebar */
+.sidebar-wrapper {
+    background: var(--alfa-card-bg);
+    border-right: 1px solid var(--alfa-border);
+}
+
+/* history */
+.sidebar-wrapper .chat-history-item {
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 4px 8px;
+    color: var(--alfa-text-muted);
+    transition: all 0.2s ease;
+}
+
+.sidebar-wrapper .chat-history-item:hover,
+.sidebar-wrapper .chat-history-item.active {
+    background: #eff6ff;
+    color: var(--alfa-primary);
+}
+
+/* ========== main cht area ========== */
+/* chat bubble*/
+.step {
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+/* use msg */
+[data-step-type="user_message"] {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 16px;
+    margin-left: auto;
+    max-width: 85%;
+}
+
+[data-step-type="user_message"] .message-content {
+    color: #1e40af;
+}
+
+/* AImsg  */
+[data-step-type="assistant_message"] {
+    background: var(--alfa-card-bg);
+    border: 1px solid var(--alfa-border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-right: auto;
+    max-width: 85%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* AI head */
+.ai-message img {
+    border-radius: 50%;
+    border: 2px solid var(--alfa-primary-light);
+    padding: 2px;
+}
+
+/* ========== message ========== */
+.message-content h1,
+.message-content h2,
+.message-content h3 {
+    font-weight: 600;
+    color: var(--alfa-text);
+    margin-bottom: 12px;
+}
+
+.message-content p {
+    line-height: 1.7;
+    color: var(--alfa-text);
+}
+
+/* quote */
+.message-content blockquote {
+    border-left: 4px solid var(--alfa-primary);
+    background: #f8fafc;
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+/* ========== legal ========== */
+.card-legal-position {
+    background: #f8fafc;
+    border: 1px solid var(--alfa-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+}
+
+.card-legal-position .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.card-legal-position .badge {
+    background: var(--alfa-success-bg);
+    color: #166534;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* "How Alfa Focus handles it" */
+.card-handles-it {
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+.card-handles-it h4 {
+    color: var(--alfa-primary-dark);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* reference) */
+.card-sources {
+    margin-top: 16px;
+    border-top: 1px solid var(--alfa-border);
+    padding-top: 12px;
+}
+
+.card-sources a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--alfa-card-bg);
+    border: 1px solid var(--alfa-border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    color: var(--alfa-text);
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.card-sources a:hover {
+    border-color: var(--alfa-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.card-sources a .arrow-icon {
+    color: var(--alfa-primary);
+}
+
+/* ========== composer ========== */
+#message-composer {
+    border: 1px solid var(--alfa-border);
+    border-radius: 16px;
+    background: var(--alfa-card-bg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 16px;
+    margin: 20px 0;
+}
+
+#chat-input {
+    font-size: 16px;
+    min-height: 24px;
+}
+
+/* sent btn */
+#chat-submit {
+    background: var(--alfa-primary);
+    color: white;
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    transition: all 0.2s ease;
+}
+
+#chat-submit:hover {
+    background: var(--alfa-primary-dark);
+    transform: scale(1.05);
+}
+
+#chat-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* warning */
+.warning-banner {
+    background: var(--alfa-warning-bg);
+    border: 1px solid var(--alfa-warning-border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #92400e;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ========== tools ========== */
+.watermark {
+    font-size: 12px;
+    color: var(--alfa-text-muted);
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* ========== respond ========== */
+@media (max-width: 768px) {
+
+    [data-step-type="user_message"],
+    [data-step-type="assistant_message"] {
+        max-width: 100%;
+    }
+
+    #header {
+        padding: 8px 16px;
+    }
+}
+
+/* ========== dark mode ========== */
+.dark body {
+    --alfa-bg: #0f172a;
+    --alfa-card-bg: #1e293b;
+    --alfa-border: #334155;
+    --alfa-text: #e2e8f0;
+    --alfa-text-muted: #94a3b8;
+}
+
+.dark [data-step-type="user_message"] {
+    background: #1e3a8a;
+    border-color: #1e40af;
+}
+
+.dark [data-step-type="assistant_message"] {
+    background: #1e293b;
+    border-color: #334155;
+}
