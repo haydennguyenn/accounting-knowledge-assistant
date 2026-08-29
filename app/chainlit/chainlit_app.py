@@ -18,8 +18,7 @@ async def on_message(message: cl.Message):
         reply_text = await cl.make_async(generate_response)(message.content)
         msg.content = reply_text
     except Exception as e:
-        msg.content = f"error message: {str(e)}"
+        msg.content = f"⚠️ error messeage: {str(e)}"
 
     
     await msg.update()
-    
