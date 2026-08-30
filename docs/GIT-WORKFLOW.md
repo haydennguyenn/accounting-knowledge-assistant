@@ -1,40 +1,53 @@
 # Git Workflow
 
-This document defines the Git workflow, branch naming, commit message conventions, pull request requirements, GitHub Actions checks, and local validation process for the project.
+This document defines the Git workflow, branch naming conventions, commit message format, pull request requirements, and CI checks for the project.
+
+## Table of Contents
+
+- [Branching Strategy](#branching-strategy)
+- [Branch Naming](#branch-naming)
+- [Development Workflow](#development-workflow)
+- [Commit Messages](#commit-messages)
+- [Pull Requests](#pull-requests)
+- [CI Requirements](#ci-requirements)
+- [Tagging Milestones](#tagging-milestones)
 
 ## Branching Strategy
 
-The `main` branch is the protected, stable branch.
+The `main` branch is the protected, stable production branch.
 
-All development work should be completed on a feature branch created from the latest `main`.
+All development work must be completed on a feature branch created from the latest `main`.
 
 ```
-main         ← production (protected, deploys automatically on push)
+main         ← production (protected, auto-deploys on push)
   ↑
 feature/*    ← new features (branched from main, PR back to main)
+fix/*        ← bug fixes (branched from main, PR back to main)
 hotfix/*     ← urgent fixes (branched from main, PR back to main)
 ```
 
-### Branch Naming
+## Branch Naming
 
-Branch names must follow:
+Branch names must follow this format:
 
-```text
+```
 <type>/<short-description>
 ```
 
-Allowed types:
-```text
-feature/ — new functionality
-fix/ — bug fixes
-test/ — tests or evaluation work
-docs/ — documentation
-chore/ — tooling, CI, configuration, dependencies
-refactor/ — code restructuring without changing intended behaviour
-```
+### Allowed Types
 
-Examples:
-```text
+| Type | Purpose |
+|------|---------|
+| `feature/` | New functionality |
+| `fix/` | Bug fixes |
+| `test/` | Tests or evaluation work |
+| `docs/` | Documentation updates |
+| `chore/` | Tooling, CI, configuration, dependencies |
+| `refactor/` | Code restructuring without changing behavior |
+
+### Examples
+
+```
 feature/add-upload-page
 feature/rag-retriever
 fix/chainlit-routing
@@ -48,50 +61,79 @@ refactor/rag-services
 
 If the branch has not been pushed:
 
-```
-git branch -m feature/correct-name
-```
-If the old branch has already been pushed:
-
-```
-git branch -m feature/correct-name
-git push -u origin feature/correct-name
-git push origin --delete feature/old-name
+```bash
+git branch -m <type>/correct-name
 ```
 
-## Workflow
+If the branch has already been pushed:
 
+```bash
+git branch -m <type>/correct-name
+git push -u origin <type>/correct-name
+git push origin --delete <type>/old-name
 ```
-git checkout main && git pull
-git checkout -b feature/(name)
 
-# ...make changes, commit...
+## Development Workflow
 
-git push -u origin feature/(name)
+1. Update your local `main` branch:
+   ```bash
+   git checkout main && git pull
+   ```
 
-gh pr create --base main   # or go to github and create pull request
-# review, merge, GitHub deletes the branch automatically
-```
+2. Create a new feature branch:
+   ```bash
+   git checkout -b feature/<name>
+   ```
+
+3. Make changes and commit regularly:
+   ```bash
+   git add <files>
+   git commit -m "<type>: <description>"
+   ```
+
+4. Push your branch:
+   ```bash
+   git push -u origin feature/<name>
+   ```
+
+5. Create a pull request:
+   ```bash
+   gh pr create --base main
+   ```
+   Or manually create the PR on GitHub.
+
+6. After approval and merge, GitHub will automatically delete the feature branch.
 
 ## Commit Messages
 
-Commits format:
+### Format
+
 ```
 <type>: <description>
 ```
 
-Allowed types:
-``` text
-feat — new functionality
-fix — bug fix
-test — tests
-docs — documentation
-chore — configuration, tooling, CI, dependencies
-refactor — code restructuring
-```
+### Allowed Types
 
-Examples:
-``` text
+| Type | Purpose |
+|------|---------|
+| `feat` | New functionality |
+| `fix` | Bug fix |
+| `test` | Tests |
+| `docs` | Documentation |
+| `chore` | Configuration, tooling, CI, dependencies |
+| `refactor` | Code restructuring |
+
+### Guidelines
+
+- Use lowercase types
+- Include a colon followed by a space after the type
+- Write meaningful descriptions
+- Describe the change, not the process of making it
+- Keep the description concise but clear
+
+### Examples
+
+```
 feat: add document upload endpoint
 feat: implement vector retrieval
 fix: correct chainlit mount path
@@ -101,37 +143,37 @@ chore: configure github actions
 refactor: separate document processing service
 ```
 
-Commit messages should:
-- use lowercase types
-- contain a colon followed by a space
-- have a meaningful description
-- describe the change rather than the process of making it
+## Pull Requests
 
-### Making a Commit
-```
-git add .
-git commit -m "feat: add document upload endpoint"
-```
+### Requirements
 
-## Merge Strategy
+- All PRs must target the `main` branch
+- CI checks must pass before merge
+- At least one approval required (if configured)
+- No direct pushes to `main` are allowed
 
-Squash merge every PR into `main` — keeps history linear and each merge maps to one logical
-change.
+### Merge Strategy
 
-## Protected Branch
+**Squash merge** is used for all PRs into `main`. This:
+- Keeps history linear and clean
+- Maps each merge to one logical change
+- Preserves the PR description in the commit message
 
-`main` is protected — no direct pushes. All changes go through a pull request.
+## CI Requirements
 
-CI must pass before merge:
-- Dependencies and Compilation Test
-- Branch and Commit Message Naming Checks
+The following GitHub Actions checks must pass before merge:
 
-## Tagging a milestone (optional)
+- **Dependencies and Compilation Test** — Ensures all dependencies install and code compiles
+- **Branch and Commit Message Naming Checks** — Validates branch names and commit messages follow conventions
 
-If you want to mark a submission or checkpoint, tag `main` directly — no release branch needed:
+## Tagging Milestones
+
+To mark a submission or checkpoint, tag `main` directly:
 
 ```bash
 git checkout main && git pull origin main
-git tag v0.1.0 -m "Milestone: <what this is>"
+git tag v0.1.0 -m "Milestone: <description>"
 git push origin v0.1.0
 ```
+
+No release branch is needed for milestones.

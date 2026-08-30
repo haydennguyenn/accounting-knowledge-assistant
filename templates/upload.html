@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Accounting Digital Assistant - Documents</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="static/css/style.css">
+    </head>
+    <body>
+
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="logo">Accounting Digital Assistant</div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">TEAM 83 · RMIT CAPSTONE</div>
+                <button class="new-chat-btn"><i class="fas fa-plus"></i> New Chat</button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Recent Conversations</div>
+                <div class="sidebar-item"><i class="far fa-file-alt"></i> Prepaid expenses</div>
+                <div class="sidebar-item"><i class="far fa-file-alt"></i> Revenue recognition</div>
+                <div class="sidebar-item"><i class="far fa-file-alt"></i> Monthly close checklist</div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-item active"><i class="far fa-file-pdf"></i> Documents</div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="settings-btn"><i class="fas fa-cog"></i> Settings</div>
+                <div class="version-text">Prototype · v0.1</div>
+            </div>
+        </aside>
+
+        <!-- 主内容 -->
+        <main class="main-content">
+            <header class="header">
+                <div class="badge">Capstone Prototype</div>
+            </header>
+
+            <h1 class="page-title">Documents</h1>
+            <p class="page-subtitle">Upload documents for use within the system.</p>
+
+            <!-- 上传区域 -->
+            <div class="upload-zone">
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="upload-title">Drag and drop files here</div>
+                <div class="upload-desc">or select files from your computer</div>
+                <button class="browse-btn">Browse Files</button>
+                <div class="file-types">Supported file types: PDF · DOCX · TXT</div>
+            </div>
+
+            <!-- 文档列表 -->
+            <div class="list-header">
+                <h2 class="list-title">Uploaded Documents</h2>
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Search documents">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>FILE NAME</th>
+                            <th>TYPE</th>
+                            <th>UPLOAD DATE</th>
+                            <th>STATUS</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="file-info">
+                                    <div class="file-icon">PDF</div>
+                                    <div>
+                                        <div class="file-name">Accounting Policy Manual.pdf</div>
+                                        <span class="file-sub">Uploaded document</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>PDF</td>
+                            <td>18 Aug 2026</td>
+                            <td><span class="status-badge processed">Processed</span></td>
+                            <td><button class="action-btn"><i class="fas fa-ellipsis-h"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-info">
+                                    <div class="file-icon docx">DOCX</div>
+                                    <div>
+                                        <div class="file-name">Chart of Accounts.docx</div>
+                                        <span class="file-sub">Uploaded document</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>DOCX</td>
+                            <td>17 Aug 2026</td>
+                            <td><span class="status-badge uploaded">Uploaded</span></td>
+                            <td><button class="action-btn"><i class="fas fa-ellipsis-h"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-info">
+                                    <div class="file-icon">PDF</div>
+                                    <div>
+                                        <div class="file-name">Internal Guidelines.pdf</div>
+                                        <span class="file-sub">Uploaded document</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>PDF</td>
+                            <td>15 Aug 2026</td>
+                            <td><span class="status-badge processed">Processed</span></td>
+                            <td><button class="action-btn"><i class="fas fa-ellipsis-h"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+    </body>
+    </html>

@@ -11,10 +11,6 @@ venv/
 .env.*
 !.env.example
 
-# Chainlit generates this locally on first run
-.chainlit/
-.files/
-
 # OS
 .DS_Store
 
