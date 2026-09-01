@@ -101,6 +101,96 @@ CH-15 is not a limitation we chose. Member-specific figures depend on data the a
 
 UP-2 is the requirement most likely to be dropped under time pressure and the one that will cost most if it is. Without the date and the corpus, a document cannot be filtered correctly and will surface against the wrong questions.
 
+### 5.1 Document management and ingestion lifecycle
+
+Uploaded documents must pass through a defined ingestion lifecycle before they become available to the knowledge base. This ensures incomplete or failed documents are not returned during retrieval and that retrieved chunks can always be traced back to their original source.
+
+The document lifecycle is:
+
+`Upload → Validation → Parsing → Chunking → Embedding → Storage / Indexing → Ready`
+
+If any required stage fails, the document moves to a `failed` state and must not be made available for retrieval.
+
+| ID | P | Requirement |
+|---|---|---|
+| DI-1 | M | Every uploaded document must be assigned a unique document identifier before processing begins. |
+| DI-2 | M | The system must record the current ingestion state of each document. |
+| DI-3 | M | Required document information must be validated before processing begins. |
+| DI-4 | M | Valid documents must be parsed to extract usable textual content. |
+| DI-5 | M | Parsed document content must be divided into retrievable chunks before embeddings are generated. |
+| DI-6 | M | Every chunk must retain a reference to its parent document and its position within that document. |
+| DI-7 | M | An embedding must be generated for every valid retrievable chunk before it becomes available to retrieval. |
+| DI-8 | M | A document must only become available for retrieval after all required ingestion stages have completed successfully. |
+| DI-9 | M | Failed or incomplete documents and chunks must not be returned by the retrieval system. |
+| DI-10 | M | If validation, parsing, chunking, embedding, or storage fails, the document must be marked as `failed` and a readable failure reason must be retained. |
+| DI-11 | S | A processing failure affecting one document should not prevent other valid documents from continuing through ingestion. |
+| DI-12 | S | Reprocessing a document should not create duplicate retrievable chunks for the same document and chunk position. |
+
+#### Document processing states
+
+| State | Meaning |
+|---|---|
+| `pending` | The upload has been accepted and is waiting for processing. |
+| `processing` | One or more ingestion stages are currently running. |
+| `ready` | Processing has completed successfully and the document is available for retrieval. |
+| `failed` | Processing could not be completed and the document is excluded from retrieval. |
+| `superseded` | A newer version has replaced the document for current queries while the older version is retained for historical questions. |
+| `withdrawn` | The document remains retained but is intentionally excluded from retrieval. |
+
+#### Document-level metadata
+
+The system must retain enough metadata to manage each document throughout its lifecycle and support correct filtering during retrieval.
+
+| Field | Purpose |
+|---|---|
+| `document_id` | Unique identifier for the document. |
+| `filename` | Original uploaded filename. |
+| `corpus` | Identifies whether the document is authority or firm procedure. |
+| `effective_from` | Date from which the document applies. |
+| `effective_to` | Date until which the document applies, where known. |
+| `status` | Current ingestion state. |
+| `uploaded_by` | Identifies the authorised user who uploaded the document. |
+| `uploaded_at` | Records when the document was uploaded. |
+| `failure_reason` | Readable explanation when processing fails. |
+| `superseded_by` | Reference to a newer document version where applicable. |
+| `chunk_count` | Number of retrievable chunks created from the document. |
+
+#### Chunk-level metadata and source attribution
+
+Each retrievable chunk must retain enough information to identify where the retrieved content came from.
+
+| Field | Purpose |
+|---|---|
+| `chunk_id` | Unique identifier for the chunk. |
+| `document_id` | Reference to the original parent document. |
+| `chunk_index` | Position of the chunk within the document. |
+| `content` | Text used during retrieval and answer generation. |
+| `embedding` | Vector representation used during semantic retrieval. |
+| `page_or_section` | Page, section, heading, or other source location where available. |
+| `source_title` | Human-readable name of the original source. |
+| `source_url` | Openable source location where available. |
+| `corpus` | Identifies whether the source is authority or firm procedure. |
+| `effective_from` | Supports time-aware retrieval where applicable. |
+| `effective_to` | Supports retrieval of historical material where applicable. |
+
+Every retrieved chunk must remain linked to its parent document so that the system can provide source attribution and citations for generated answers.
+
+#### Upload and processing failure scenarios
+
+The ingestion process must account for:
+
+- missing required upload information;
+- unsupported or invalid file types;
+- corrupted or unreadable documents;
+- documents where no usable text can be extracted;
+- parsing failures;
+- chunking failures;
+- embedding generation failures;
+- database or storage failures;
+- duplicate processing attempts.
+
+If processing cannot be completed, the document must remain visible with a `failed` status and a readable failure reason. Incomplete content from a failed document must not be available to retrieval.
+
 ## 6. Data handling and privacy
 
 The constraints behind these are set out in [`DOMAIN-PRIMER.md`](DOMAIN-PRIMER.md) section 5. Two are worth stating here because they are absolute rather than negotiable: professional guidance is that client data must not go into public AI tools, and under the TPB code an error the practitioner relied on is the practitioner's breach regardless of what produced it.
