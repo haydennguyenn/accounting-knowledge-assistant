@@ -1,11 +1,5 @@
 # RAG Design
 
-How the assistant works, and where each piece lives in this repo. Pre-client-meeting: where a decision depends on an unknown, the unknown is named and a default is chosen rather than deferred.
-
-Read [`DOMAIN-PRIMER.md`](DOMAIN-PRIMER.md) first. Most of what follows is a consequence of its sections 2 and 5 rather than a technology preference.
-
-The stack is already fixed by the scaffold on `main`: FastAPI with Chainlit mounted at `/chat`, Supabase Postgres with pgvector, Render for deployment, Python 3.13. Nothing below proposes changing that. What follows is what goes *inside* the empty modules.
-
 ## 1. What we are building, and what we are not
 
 **Building:** an internal, citation-first question-answering assistant for Alfa Focus staff. Two kinds of question - what does the law require, and how does this firm do it - answered separately and labelled as such, with every claim traceable to a source a human can open.
