@@ -151,7 +151,9 @@ See [`.env.example`](.env.example) for all variables and [`docs/DATABASE.md`](do
 
 ### Running the Application
 
-Chainlit is mounted into FastAPI at `/chat` (see `app/main.py`). Start the server from the repository root:
+Chainlit is mounted into FastAPI at `/chat` (see `app/main.py`).
+
+#### Option 1: Running Locally (Uvicorn)
 
 **Development (local access only):**
 ```bash
@@ -164,6 +166,31 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 source .venv/bin/activate
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+#### Option 2: Running with Docker Compose (Recommended)
+
+Docker Compose automatically loads your `.env` file and mounts your local code into the container for live reloading:
+
+1. **Build and start the application:**
+```bash
+docker compose up --build
+```
+
+2. **Run in background (detached mode):**
+```bash
+docker compose up -d --build
+```
+
+3. **Useful Docker Compose commands:**
+```bash
+# View live container logs
+docker compose logs -f
+
+# Stop and remove containers
+docker compose down
+```
+
+*(Alternatively, you can build and run using raw Docker: `docker build -t alfa-focus-pilot . && docker run -p 8000:8000 --env-file .env alfa-focus-pilot`)*
 
 ### Access the Application
 
