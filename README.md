@@ -176,6 +176,36 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 For LAN access, replace `localhost` with your machine's local IP address.
 
+### Testing
+
+The test suite uses `pytest` and verifies database connections, schema existence, Hugging Face embedding generation, and environment configuration.
+
+Make sure your virtual environment is active and `.env` has valid credentials before running tests:
+
+```bash
+source .venv/bin/activate
+```
+
+**Run all tests:**
+```bash
+pytest -v
+```
+
+**Run specific test modules:**
+```bash
+pytest tests/db/{TEST FILE} -v
+```
+
+```bash
+# Example: running the env loading tests
+pytest tests/db/test_env.py -v
+```
+
+**Useful pytest flags:**
+- `-v`: Verbose output showing each test status
+- `-s`: Print stdout messages (useful for viewing embedding dimensions and table lists)
+- `-k <pattern>`: Run tests matching a keyword (e.g. `pytest -k "connection"`)
+
 ### Troubleshooting
 
 **"Module not found: app"**
@@ -209,7 +239,6 @@ Two additional rules for this project:
 
 Tracked here so nobody assumes they work:
 
-- `Dockerfile` is empty — Render deployment cannot succeed until it is written, and no CI check catches this.
 - `.github/workflows/deploy.yml` does not deploy. It contains a commit-message check. Rename it to `commit-message.yml` or make it deploy.
 - `app/rag/embedder.py` is empty — BGE-M3 embedding implementation pending (see [`docs/DATABASE.md`](docs/DATABASE.md) for integration guide).
 - `app/rag/retriever.py` and `app/rag/generator.py` are incomplete — RAG pipeline scaffolded but not functional.
