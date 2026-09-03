@@ -151,7 +151,9 @@ See [`.env.example`](.env.example) for all variables and [`docs/DATABASE.md`](do
 
 ### Running the Application
 
-Chainlit is mounted into FastAPI at `/chat` (see `app/main.py`). Start the server from the repository root:
+Chainlit is mounted into FastAPI at `/chat` (see `app/main.py`).
+
+#### Option 1: Running Locally (Uvicorn)
 
 **Development (local access only):**
 ```bash
@@ -165,6 +167,31 @@ source .venv/bin/activate
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+#### Option 2: Running with Docker Compose (Recommended)
+
+Docker Compose automatically loads your `.env` file and mounts your local code into the container for live reloading:
+
+1. **Build and start the application:**
+```bash
+docker compose up --build
+```
+
+2. **Run in background (detached mode):**
+```bash
+docker compose up -d --build
+```
+
+3. **Useful Docker Compose commands:**
+```bash
+# View live container logs
+docker compose logs -f
+
+# Stop and remove containers
+docker compose down
+```
+
+*(Alternatively, you can build and run using raw Docker: `docker build -t alfa-focus-pilot . && docker run -p 8000:8000 --env-file .env alfa-focus-pilot`)*
+
 ### Access the Application
 
 | Endpoint | URL | Description |
@@ -175,6 +202,36 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 | API docs | `http://localhost:8000/docs` | FastAPI Swagger UI |
 
 For LAN access, replace `localhost` with your machine's local IP address.
+
+### Testing
+
+The test suite uses `pytest` and verifies database connections, schema existence, Hugging Face embedding generation, and environment configuration.
+
+Make sure your virtual environment is active and `.env` has valid credentials before running tests:
+
+```bash
+source .venv/bin/activate
+```
+
+**Run all tests:**
+```bash
+pytest -v
+```
+
+**Run specific test modules:**
+```bash
+pytest tests/db/{TEST FILE} -v
+```
+
+```bash
+# Example: running the env loading tests
+pytest tests/db/test_env.py -v
+```
+
+**Useful pytest flags:**
+- `-v`: Verbose output showing each test status
+- `-s`: Print stdout messages (useful for viewing embedding dimensions and table lists)
+- `-k <pattern>`: Run tests matching a keyword (e.g. `pytest -k "connection"`)
 
 ### Troubleshooting
 
@@ -209,7 +266,6 @@ Two additional rules for this project:
 
 Tracked here so nobody assumes they work:
 
-- `Dockerfile` is empty — Render deployment cannot succeed until it is written, and no CI check catches this.
 - `.github/workflows/deploy.yml` does not deploy. It contains a commit-message check. Rename it to `commit-message.yml` or make it deploy.
 - `app/rag/embedder.py` is empty — BGE-M3 embedding implementation pending (see [`docs/DATABASE.md`](docs/DATABASE.md) for integration guide).
 - `app/rag/retriever.py` and `app/rag/generator.py` are incomplete — RAG pipeline scaffolded but not functional.

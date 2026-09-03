@@ -1,14 +1,17 @@
+import os
 from sqlalchemy import create_engine, text
 
-# Try the pooler URL with the password from .env
-pooler_url = "postgresql://postgres.fwxeuxawigqenjfijrrt:zuwZd98sLQC5IIyv@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres"
-print(f"Testing pooler URL...")
 
-engine = create_engine(pooler_url, pool_pre_ping=True)
+def test_pooler_connection():
+    """Verify that the database connection via the Supabase pooler succeeds."""
+    pooler_url = os.getenv(
+        "SUPABASE_POOLER_URL",
+        "postgresql://postgres.fwxeuxawigqenjfijrrt:zuwZd98sLQC5IIyv@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres"
+    )
+    assert pooler_url, "Pooler URL is not specified"
 
-try:
+    engine = create_engine(pooler_url, pool_pre_ping=True)
     with engine.connect() as conn:
         result = conn.execute(text("SELECT 1")).scalar()
-        print(f"✓ Connected successfully! Result: {result}")
-except Exception as e:
-    print(f"✗ Connection failed: {e}")
+        assert result == 1, f"Expected 1, got {result}"
+

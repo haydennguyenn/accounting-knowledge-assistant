@@ -1,17 +1,14 @@
-import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+from app.config import settings
 
-load_dotenv(override=True)
 
-db_url = os.getenv("SUPABASE_DB_URL")
-print(f"Using DB URL: {db_url}")
+def test_direct_connection():
+    """Verify that a direct connection using SUPABASE_DB_URL succeeds."""
+    db_url = settings.SUPABASE_DB_URL
+    assert db_url, "SUPABASE_DB_URL is missing or not set in configuration"
 
-engine = create_engine(db_url, pool_pre_ping=True)
-
-try:
+    engine = create_engine(db_url, pool_pre_ping=True)
     with engine.connect() as conn:
         result = conn.execute(text("SELECT 1")).scalar()
-        print(f"✓ Connected successfully! Result: {result}")
-except Exception as e:
-    print(f"✗ Connection failed: {e}")
+        assert result == 1, f"Expected 1, got {result}"
+

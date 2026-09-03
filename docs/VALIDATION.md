@@ -15,14 +15,18 @@ Artboards reviewed:
 | 01 | Main chat interface |
 | 02 | Document upload page |
 | 03 | Chat loading and no-answer states |
+| 04 | Main landing / index page |
+| 05 | LLM testing and evaluation page |
 
-Artboard 03 was added in the revision. The first version of the set had two artboards.
+Artboard 03 was added in the first revision. Artboards 04 and 05 were reviewed as a supplemental set on 2026-08-28.
 
 ## Result
 
-**Validated.** Both screens address the requirements listed in REQUIREMENTS.md sections 4, 5 and 7.
+**Artboards 01-03: validated.** These screens address the requirements listed in REQUIREMENTS.md sections 4, 5 and 7, subject to the three minor items in section 5.
 
 Round one raised 12 change requests, 5 of which blocked acceptance. All 12 were addressed in the revision. Three minor items remain open and are recorded in section 5; none of them blocks build.
+
+**Artboards 04-05: changes required.** The landing page provides a clear navigation flow, and the testing page supports a basic single-question, two-model comparison. The set does not yet address several mandatory requirements in [`TESTING-PAGE-REQUIREMENTS.md`](TESTING-PAGE-REQUIREMENTS.md), and the landing page conflicts with EV-49 by linking the testing area from the normal product interface. These two artboards are not cleared for build in their current form; the detailed result is in section 8.
 
 ## 1. Round one and what changed
 
@@ -124,8 +128,67 @@ REQUIREMENTS.md marks these `[ASSUMED]` pending the first client meeting. The wi
 
 Flag these at the client meeting rather than designing roles into the interface ahead of an answer.
 
-## 8. Sign-off
+## 8. Supplemental validation: landing and testing, artboards 04 and 05
 
-The wireframes are validated against REQUIREMENTS.md as at 2026-08-21 and are cleared for build.
+Reviewed 2026-08-28 against [`REQUIREMENTS.md`](REQUIREMENTS.md) and [`TESTING-PAGE-REQUIREMENTS.md`](TESTING-PAGE-REQUIREMENTS.md). This review treats visible controls and states as evidence of what has been designed. It does not infer storage, access control, metric calculation, or other implementation behaviour from a static wireframe.
 
-Validation confirms the requirements have been designed for. It does not confirm they are met. Rows in sections 2 to 4 should be read as designed for, and the corresponding rows in [`TRACEABILITY.md`](TRACEABILITY.md) stay unverified until there is a running system to test.
+Status meanings:
+
+- **Aligned** - the required screen surface is visibly designed.
+- **Partial** - part of the required interaction is visible, but mandatory states or information are missing.
+- **Gap** - the requirement is absent or the design conflicts with it.
+- **Not verifiable** - the requirement depends on implementation or stored data and cannot be confirmed from the wireframe.
+
+### 8.1 Artboard 04 - Main landing / index page
+
+| Requirement | Status | Evidence and finding |
+|---|---|---|
+| NF-2 | Aligned | The page uses three clearly labelled destination cards with one primary action each: AI Assistant, Documents, and LLM Testing & Evaluation. The persistent rail repeats the navigation, so the main tasks are discoverable without training. |
+| DH-5 | Partial | A signed-in user, role, and sign-out control are visible. This designs an authenticated state but does not show the unauthenticated or access-denied state, so enforcement is not verified. |
+| DH-7 | Partial | Recent conversations are visible in the rail, which designs for retained history. Retention period and access behaviour remain outside what the wireframe can prove. |
+| EV-49 | Gap - blocker | The LLM Testing & Evaluation card and the `LLM Testing` rail item link the testing area from the normal product interface. EV-49 requires `/testing` to be restricted to Team 83 and approved reviewers and not linked from the assistant interface. |
+| Client and scope fidelity | Gap | The screen is labelled `Accounting Knowledge Assistant` / `Accounting Digital Transformation` and uses generic accounting examples. The validated artboards 01-03 were deliberately recast as the Alfa Focus SMSF Assistant after CR-11. Artboard 04 reintroduces the naming and scope ambiguity that CR-11 closed. |
+
+**Functional assessment:** the landing page is coherent as navigation, but it is not accepted until the testing entry point is removed from the firm-user experience or placed behind an explicit Team 83/reviewer permission state. Product naming and examples must also return to the Alfa Focus SMSF scope.
+
+### 8.2 Artboard 05 - LLM Testing & Evaluation page
+
+| Requirement | Status | Evidence and finding |
+|---|---|---|
+| EV-1, EV-24 | Partial | One test case can be viewed against Model A and Model B, with answer cards shown side by side. The cards do not visibly expose each model's ordered retrieved chunks and retrieval scores, so the complete per-question comparison required by EV-24 is not designed. |
+| EV-2 to EV-6 | Not verifiable | Question ID, question text, expected behaviour, model choice, and answer text are visible, but the wireframe does not show the complete stored record, immutable run ID, chunk snapshots, scorer versions, prompt version, corpus snapshot, or timestamp. |
+| EV-7 to EV-20 | Partial | An evaluation-metrics table exists, but the wireframe does not demonstrate every required raw field, denominator, per-claim or per-citation decomposition, not-applicable state, or scorer version. A displayed score is not evidence that the required inputs are stored. |
+| EV-21 to EV-23 | Gap - blocker | A reviewer-notes box is present, but there is no four-point human label, no blinded reviewer mode, and no rule requiring a note for a `dangerous` label. |
+| EV-25 | Partial | Model identity is correctly visible for a developer comparison. The separate reviewer-labelling view that hides model identity and scorer verdicts is absent. |
+| EV-26 to EV-29, EV-37 | Gap | There is no reviewer preference control for Model A, Model B, or tie; no preference-reason field; and no aggregate wins/losses/ties view. |
+| EV-30 | Aligned | Model B visibly shows a distinct `No Source` outcome rather than presenting an unsupported answer. This is the required screen surface for `outcome = no_source`. |
+| EV-31 to EV-33, EV-39, EV-40 | Gap - blocker | Separate refused, error, incomplete-run, and correctness-not-applicable states are not shown. The wireframe therefore does not establish that no-source, refusal, and system error cannot collapse into the same empty-answer state. |
+| EV-34 to EV-36 | Gap | The design has no independent multi-reviewer labels, disagreement state, adjudication, pairwise agreement, Cohen's kappa, or sample size. |
+| EV-41 to EV-44 | Gap - blocker | The metrics are presented as one flat table for a test case. There is no per-question-class aggregation, gate beside every gated metric, hard pass/fail treatment for citation resolution, or separation of retrieval metrics from generation metrics. |
+| EV-45 to EV-48 | Partial | `Run Again` and `Save Evaluation` are present, but there is no previous-run diff, question-level regression drill-down, class/outcome/model filter, or report export. Saving an evaluation is not the export required by EV-48. |
+| EV-49 | Gap - blocker | A signed-in user is shown, but no Team 83/reviewer-only permission state is designed, and artboard 04 exposes the page through normal product navigation. |
+| EV-50, EV-51 | Not verifiable | The sample question contains no visible client identifier and a user identity is shown, but identifier screening and reviewer attribution cannot be confirmed from the page. |
+
+**Functional assessment:** the page is functionally understandable for a manual single-question A/B check: select a test, choose two models, run, compare answers and metrics, add notes, and save. It is not yet a functional design for the required evaluation lifecycle because reviewer labelling, distinct outcome states, retrieved-chunk inspection, metric gates and grouping, multi-reviewer adjudication, aggregate reporting, diff/filter/export, and access isolation are missing.
+
+### 8.3 Required wireframe changes before acceptance
+
+1. Remove testing links from the normal assistant/firm-user navigation, or show an explicit Team 83/reviewer-only permission state that makes the page absent for other users (EV-49).
+2. Add a blinded reviewer mode with the four human labels, mandatory notes for `dangerous`, and no model identity or scorer verdicts (EV-21 to EV-23, EV-25).
+3. Show each model's ordered retrieved chunks, retrieval scores, and scorer verdict details alongside its answer (EV-2 to EV-4, EV-24).
+4. Add mutually exclusive `no_source`, `refused`, and `error` states, plus incomplete-run and not-applicable treatments (EV-30 to EV-33, EV-39, EV-40).
+5. Add model preference controls for Model A, Model B, and tie, with a reason selector and aggregate wins/losses/ties (EV-26 to EV-29, EV-37, EV-38).
+6. Separate retrieval and generation metrics, display each gate beside its value, make citation resolution a hard pass/fail, and add per-class aggregation (EV-41 to EV-44).
+7. Add independent reviewer labels, disagreement and adjudication views, pairwise agreement, Cohen's kappa, and sample size (EV-34 to EV-36).
+8. Add previous-run comparison, question-level regression drill-down, filters, and report export (EV-45 to EV-48).
+9. Restore Alfa Focus SMSF naming and SMSF-specific examples so the landing page remains consistent with the accepted artboards and project scope.
+
+### 8.4 Supplemental decision
+
+**Changes required.** Artboard 04 is usable navigation but conflicts with the testing-access requirement. Artboard 05 demonstrates the core comparison concept but covers only part of the mandatory evaluation workflow. Artboards 04 and 05 are not cleared for build until the blocker items above are represented in the wireframes.
+
+## 9. Sign-off
+
+Artboards 01-03 remain validated against REQUIREMENTS.md as at 2026-08-21 and are cleared for build. Artboards 04-05 were reviewed on 2026-08-28 and require revision before build.
+
+Validation confirms only that requirements have been designed for. It does not confirm they are implemented or met. Rows marked aligned or partial remain unverified until there is a running system to test.

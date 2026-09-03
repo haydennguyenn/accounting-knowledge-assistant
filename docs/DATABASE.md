@@ -15,12 +15,9 @@ For Australian SMSF practice, one query must:
 
 pgvector allows all three operations in a single SQL query with HNSW or IVFFlat indexing. The alternative — Pinecone or Weaviate for vectors, Postgres for metadata, full-text search in Elasticsearch — means three systems to sync and three round trips per query.
 
-### Two Supabase Projects
-
 | Environment | Purpose | Connection |
 |-------------|---------|------------|
 | **Dev** | Local development, seeded with test documents | `SUPABASE_DB_URL` in `.env` |
-| **Prod** | Deployed on Render, client-facing data | `SUPABASE_DB_URL` in Render env vars |
 
 Both use Supabase's free tier (500MB storage, 2GB bandwidth/month). Data persists independently of the Render container.
 
@@ -172,14 +169,6 @@ The `<=>` operator is cosine distance (0 = identical, 2 = opposite). Subtract fr
    ```bash
    SUPABASE_DB_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
    ```
-
-### Production (Render)
-
-1. **Create separate Supabase project** for prod
-2. **Run schema** (same as dev)
-3. **Add `SUPABASE_DB_URL` to Render dashboard** → Environment Variables
-
-The app reads `settings.SUPABASE_DB_URL` via `app/config.py` — no code changes needed between environments.
 
 ### Testing Connection
 
