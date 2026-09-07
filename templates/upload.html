@@ -10,33 +10,34 @@
     </head>
     <body>
 
-        <!-- 侧边栏 -->
-        <aside class="sidebar">
-            <div class="logo">Accounting Digital Assistant</div>
-            
-            <div class="sidebar-section">
-                <div class="sidebar-title">TEAM 83 · RMIT CAPSTONE</div>
-                <button class="new-chat-btn"><i class="fas fa-plus"></i> New Chat</button>
-            </div>
+        <!-- sidebar -->
+    <aside class="sidebar">
+        <div class="logo">Accounting Digital Assistant</div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-title">TEAM 83 · RMIT CAPSTONE</div>
+            <button class="new-chat-btn"><i class="fas fa-plus"></i> New Chat</button>
+        </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Recent Conversations</div>
-                <div class="sidebar-item"><i class="far fa-file-alt"></i> Prepaid expenses</div>
-                <div class="sidebar-item"><i class="far fa-file-alt"></i> Revenue recognition</div>
-                <div class="sidebar-item"><i class="far fa-file-alt"></i> Monthly close checklist</div>
-            </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Recent Conversations</div>
+            <div class="sidebar-item"><i class="far fa-file-alt"></i> Prepaid expenses</div>
+            <div class="sidebar-item"><i class="far fa-file-alt"></i> Revenue recognition</div>
+            <div class="sidebar-item"><i class="far fa-file-alt"></i> Monthly close checklist</div>
+        </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-item active"><i class="far fa-file-pdf"></i> Documents</div>
-            </div>
+        <div class="sidebar-section">
+            <a href="home" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
+            <a href="upload" class="sidebar-item active"><i class="far fa-file-pdf"></i> Documents</a>
+            <a href="testing" class="sidebar-item"><i class="fas fa-flask"></i> LLM Testing</a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="settings-btn"><i class="fas fa-cog"></i> Settings</div>
+            <div class="version-text">Prototype · v0.1</div>
+        </div>
+    </aside>
 
-            <div class="sidebar-footer">
-                <div class="settings-btn"><i class="fas fa-cog"></i> Settings</div>
-                <div class="version-text">Prototype · v0.1</div>
-            </div>
-        </aside>
-
-        <!-- 主内容 -->
+        <!-- main -->
         <main class="main-content">
             <header class="header">
                 <div class="badge">Capstone Prototype</div>
@@ -45,7 +46,7 @@
             <h1 class="page-title">Documents</h1>
             <p class="page-subtitle">Upload documents for use within the system.</p>
 
-            <!-- 上传区域 -->
+            <!-- upload -->
             <div class="upload-zone">
                 <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                 <div class="upload-title">Drag and drop files here</div>
@@ -54,7 +55,7 @@
                 <div class="file-types">Supported file types: PDF · DOCX · TXT</div>
             </div>
 
-            <!-- 文档列表 -->
+            <!-- file list -->
             <div class="list-header">
                 <h2 class="list-title">Uploaded Documents</h2>
                 <div class="search-box">
