@@ -1,10 +1,16 @@
-from fastapi import APIRouter
-
+from pathlib import Path
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 router = APIRouter()
-#TODO: connect HTML template to return value 2, make index.html with navigation pages included: testing.pyç, upload.py, chainlit_app.py
-@router.get("/testing")
-def testing_page():
-    return {"message": "Template for LLM testing endpoint."}
+
+BASE_DIR = Path(__file__).resolve().parents[2]
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+
+@router.get("/testing", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse(request=request, name="testing.html")
 
 
 # Examples
