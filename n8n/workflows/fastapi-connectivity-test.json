@@ -1,0 +1,60 @@
+{
+  "name": "FastAPI Connectivity Test",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "fastapi-test",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dba36912-c805-4564-a206-3399e05c3313",
+      "name": "Webhook",
+      "webhookId": "bc86261d-5301-464e-8eec-d2a73cde5ad6"
+    },
+    {
+      "parameters": {
+        "url": "http://app:8000/api/n8n-test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "380008c1-7b9b-4ea0-aef1-fd86a4e77c06",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6e19f284-8e67-4903-80e6-1e12e7534b80",
+  "meta": {
+    "instanceId": "d756f2ae5345fffd9a05c9201d3c998914a19c40ea37b3afa1cd13285ef7ad5e"
+  },
+  "id": "OtghFaNCpoLhXdfK",
+  "tags": []
+}

@@ -271,3 +271,64 @@ Tracked here so nobody assumes they work:
 - `app/rag/retriever.py` and `app/rag/generator.py` are incomplete — RAG pipeline scaffolded but not functional.
 - `mlflow` is not in `requirements.txt` — the evaluation design in [`docs/EVALUATION.md`](docs/EVALUATION.md) assumes it.
 - `ci.yml` has a commented-out `pytest` step — that is where the evaluation gates hook in.
+
+## n8n Workflow Automation
+
+n8n runs as a separate service alongside the FastAPI/Chainlit application using Docker Compose.
+
+### Start the environment
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+- FastAPI / Chainlit: `http://localhost:8000`
+- n8n editor: `http://localhost:5678`
+
+### FastAPI connectivity test
+
+A test workflow named `FastAPI Connectivity Test` verifies communication between n8n and FastAPI.
+
+The workflow contains:
+
+1. A Webhook trigger at `/fastapi-test`
+2. An HTTP Request node that calls `http://app:8000/api/n8n-test`
+
+Docker Compose provides internal DNS, so n8n accesses FastAPI using the service name `app` rather than `localhost`.
+
+Expected response:
+
+```json
+{
+  "status": "ok",
+  "message": "FastAPI successfully reached from n8n"
+}
+```
+
+The exported workflow is stored at:
+
+`n8n/workflows/fastapi-connectivity-test.json`
+
+### n8n persistence
+
+n8n workflow and credential data is persisted using the named Docker volume:
+
+`n8n_data`
+
+Stopping the services with:
+
+```bash
+docker compose down
+```
+
+and restarting with:
+
+```bash
+docker compose up -d
+```
+
+preserves the n8n workflow data.
+
+Do not use `docker compose down -v` unless the n8n volume should intentionally be deleted.
