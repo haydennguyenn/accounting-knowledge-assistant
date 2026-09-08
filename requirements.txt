@@ -21,3 +21,6 @@ anthropic>=0.40.0
 
 # Testing
 pytest==9.1.1
+
+# For supabase Python SDK
+supabase>=2.0.0
