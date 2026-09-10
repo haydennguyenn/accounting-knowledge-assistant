@@ -166,6 +166,20 @@ Citation resolution is a hard gate at 1.00 because it is deterministic - a looku
 
 Refusal precision deserves attention. A system that refuses everything scores perfectly on recall and is useless. Report both, always together.
 
+### Conversational and operational
+
+Not covered above because they are not per-answer correctness checks - they are about the assistant staying itself across a session, and about whether it is fast and cheap enough to actually run.
+
+| Metric | Definition | Gate |
+|---|---|---|
+| Coherence | Judged: does each turn stay logically consistent with earlier turns in the same session (no contradicting an earlier cap it stated, no forgetting a scoping the user already gave) | >= 0.90 |
+| Role adherence | Judged against `Guidelines()`: correct tone (professional, not casual; not personal-advice-giving), law vs procedure kept in separate labelled sections, no answer outside the accounting/super domain | >= 0.95 |
+| Fallback rate | Share of sessions where the assistant could not answer and had to hand off (distinct from a C6 refusal - this is "I don't know", not "I must not say") | report, investigate spikes |
+| P50 / P95 latency | Wall-clock time from query to final token, measured from the trace | P95 <= 8s |
+| Cost per query | Token cost of retrieval + generation, from the trace | report |
+
+Coherence and role adherence only apply to multi-turn sessions and therefore need a small set of scripted multi-turn seed conversations in `benchmarks/questions.jsonl` (a `session_id` grouping several turns), not just the single-turn seeds in section 3. Latency and cost are not judged - they come straight off the MLflow trace span timings and token counts, the same way `citation_resolves` is deterministic rather than judged.
+
 ## 5. LLM-as-judge
 
 **MLflow 3 GenAI evaluation** is the recommended harness - it unifies tracing, evaluation, and production monitoring rather than requiring a separate stack, and the same traces power the `/testing` page and production monitoring.

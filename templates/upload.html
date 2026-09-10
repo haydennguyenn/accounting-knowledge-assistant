@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accounting Digital Assistant - Documents</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
-</head>
-<body>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Accounting Digital Assistant - Documents</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="static/css/style.css">
+    </head>
+    <body>
 
-    <!-- side bar -->
+        <!-- sidebar -->
     <aside class="sidebar">
         <div class="logo">Accounting Digital Assistant</div>
         
@@ -27,20 +27,42 @@
         </div>
 
         <div class="sidebar-section">
-            <div class="sidebar-item active"><i class="far fa-file-pdf"></i> Documents</div>
+            <a href="home" class="sidebar-item"><i class="fas fa-home"></i> Home</a>
+            <a href="upload" class="sidebar-item active"><i class="far fa-file-pdf"></i> Documents</a>
+            <a href="testing" class="sidebar-item"><i class="fas fa-flask"></i> LLM Testing</a>
         </div>
-
         <div class="sidebar-footer">
             <div class="settings-btn"><i class="fas fa-cog"></i> Settings</div>
             <div class="version-text">Prototype · v0.1</div>
         </div>
     </aside>
 
-    <!-- main content -->
-    <main class="main-content">
-        <header class="header">
-            <div class="badge">Capstone Prototype</div>
-        </header>
+        <!-- main -->
+        <main class="main-content">
+            <header class="header">
+                <div class="badge">Capstone Prototype</div>
+            </header>
+
+            <h1 class="page-title">Documents</h1>
+            <p class="page-subtitle">Upload documents for use within the system.</p>
+
+            <!-- upload -->
+            <div class="upload-zone">
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="upload-title">Drag and drop files here</div>
+                <div class="upload-desc">or select files from your computer</div>
+                <button class="browse-btn">Browse Files</button>
+                <div class="file-types">Supported file types: PDF · DOCX · TXT</div>
+            </div>
+
+            <!-- file list -->
+            <div class="list-header">
+                <h2 class="list-title">Uploaded Documents</h2>
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Search documents">
+                </div>
+            </div>
 
         <h1 class="page-title">Documents</h1>
         <p class="page-subtitle">Upload documents for use within the system.</p>

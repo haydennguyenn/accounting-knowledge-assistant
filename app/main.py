@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from app.routes.upload import router as upload_router
 from app.routes.testing import router as testing_router
 from app.routes.home import router as home_router
+from app.routes.integration import router as integration_router
 
 
 app = FastAPI()
@@ -15,6 +16,7 @@ app = FastAPI()
 app.include_router(upload_router)
 app.include_router(testing_router)
 app.include_router(home_router)
+app.include_router(integration_router)
 
 @app.get("/")
 def root():
