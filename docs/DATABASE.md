@@ -19,8 +19,6 @@ pgvector allows all three operations in a single SQL query with HNSW or IVFFlat 
 |-------------|---------|------------|
 | **Dev** | Local development, seeded with test documents | `SUPABASE_DB_URL` in `.env` |
 
-Both use Supabase's free tier (500MB storage, 2GB bandwidth/month). Data persists independently of the Render container.
-
 ---
 
 ## Schema
