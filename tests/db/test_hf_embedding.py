@@ -9,6 +9,7 @@ def test_hf_embedding():
     client = InferenceClient(
         provider="hf-inference",
         api_key=settings.HF_TOKEN,
+        timeout=120,  # Increase timeout to allow for cold starts
     )
 
     sample_text = "Employees may claim reasonable travel expenses."
@@ -21,4 +22,4 @@ def test_hf_embedding():
     assert embedding is not None, "Failed to retrieve embedding (got None)"
     assert len(embedding) > 0, "Embedding vector is empty"
     # BAAI/bge-m3 typically outputs a 1024-dimension vector
-    print(f"\n✓ Embedding generated successfully with dimension: {len(embedding)}")
+    print(f"\n✓ Embedding generated successfully with dimension: {len(embedding)} \n {embedding}")

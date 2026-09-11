@@ -1,7 +1,5 @@
 # Benchmark and Evaluation Design
 
-The evaluation is the part of this project that will distinguish it. Anyone can demonstrate a RAG system answering a question. Very few student projects can say *how often it is right, on what distribution of questions, measured how, and validated against whom*.
-
 The scaffold already anticipated this: `app/routes/testing.py` exists as "LLM testing/evaluation page" and the README plans an `EvalResult` model. This document says what goes in them.
 
 Read [`RAG-DESIGN.md`](RAG-DESIGN.md) section 6 first - each behavioural rule in the answer contract maps to a check below.
