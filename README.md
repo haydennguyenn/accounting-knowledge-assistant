@@ -174,6 +174,9 @@ Docker Compose automatically loads your `.env` file and mounts your local code i
 1. **Build and start the application:**
 ```bash
 docker compose up --build
+
+# If you have already built the docker image and simply want to start up the container
+docker compose up
 ```
 
 2. **Run in background (detached mode):**
