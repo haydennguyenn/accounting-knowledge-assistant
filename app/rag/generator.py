@@ -1,3 +1,4 @@
+from typing import Dict, List, Optional
 from app.config import settings
 
 SYSTEM_PROMPT_TEMPLATE = (
@@ -92,39 +93,96 @@ def get_formatted_prompt(query: str, context: str = "No additional context provi
     return USER_PROMPT_TEMPLATE.format(query=query, context=context)
 
 
-def generate_response_gemini(prompt: str, system_prompt: str = SYSTEM_PROMPT_TEMPLATE) -> str:
+def generate_response_gemini(
+    prompt: str,
+    history: Optional[List[Dict[str, str]]] = None,
+    system_prompt: str = SYSTEM_PROMPT_TEMPLATE,
+) -> str:
     if not settings.GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY is not configured.")
 
     from google import genai
+    from google.genai import types
+
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
+    # Build multi-turn contents list if conversation history exists
+    contents: List[types.Content] = []
+    if history:
+        # Append earlier dialogue turns before the current prompt
+        for msg in history[:-1]:
+            role = "model" if msg.get("role") == "assistant" else "user"
+            contents.append(
+                types.Content(
+                    role=role,
+                    parts=[types.Part.from_text(text=msg.get("content", ""))],
+                )
+            )
+
+    # Append current prompt containing formatted query and retrieved context
+    contents.append(
+        types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=prompt)],
+        )
+    )
+
+    config = types.GenerateContentConfig(
+        system_instruction=system_prompt,
+        temperature=0.2,
+    )
+
     response = client.models.generate_content(
         model=settings.GEMINI_MODEL,
-        contents=f"{system_prompt}\n\n{prompt}",
+        contents=contents,
+        config=config,
     )
     return response.text or ""
 
-def generate_response_groq(prompt: str, system_prompt: str = SYSTEM_PROMPT_TEMPLATE) -> str:
+
+def generate_response_groq(
+    prompt: str,
+    history: Optional[List[Dict[str, str]]] = None,
+    system_prompt: str = SYSTEM_PROMPT_TEMPLATE,
+) -> str:
     if not settings.GROQ_API_KEY:
         raise ValueError("GROQ_API_KEY is not configured.")
 
     from groq import Groq
+
     client = Groq(api_key=settings.GROQ_API_KEY)
+
+    # Initialize messages list with system instructions
+    messages = [{"role": "system", "content": system_prompt}]
+
+    # Append prior conversation turns if provided
+    if history:
+        for msg in history[:-1]:
+            role = "assistant" if msg.get("role") == "assistant" else "user"
+            messages.append({"role": role, "content": msg.get("content", "")})
+
+    # Append current formatted prompt
+    messages.append({"role": "user", "content": prompt})
+
     completion = client.chat.completions.create(
         model=settings.GROQ_MODEL,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ],
+        messages=messages,
         temperature=0.2,
     )
     return completion.choices[0].message.content or ""
 
-def generate_response(query: str) -> str:
-    prompt = get_formatted_prompt(query=query)
+
+def generate_response(
+    query: str,
+    context: str = "No additional context provided.",
+    history: Optional[List[Dict[str, str]]] = None,
+) -> str:
+    """Generate response using configured LLM provider with optional context and chat history."""
+    prompt = get_formatted_prompt(query=query, context=context)
+
     if settings.GROQ_API_KEY:
-        return generate_response_groq(prompt)
-    return generate_response_gemini(prompt)
+        return generate_response_groq(prompt, history=history)
+    return generate_response_gemini(prompt, history=history)
 
 
 if __name__ == "__main__":
@@ -133,7 +191,7 @@ if __name__ == "__main__":
 
     print("=== Testing Prompt Template ===")
     print(prompt)
-    print("\n" + "="*40 + "\n")
+    print("\n" + "=" * 40 + "\n")
 
     print("=== Testing LLM 1: Groq ===")
     try:
@@ -142,7 +200,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Groq Error: {e}")
 
-    print("\n" + "="*40 + "\n")
+    print("\n" + "=" * 40 + "\n")
 
     print("=== Testing LLM 2: Google Gemini ===")
     try:
