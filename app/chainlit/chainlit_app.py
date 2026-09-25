@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, List, Optional
 import chainlit as cl
 import anyio
 from typing import Optional
@@ -7,6 +8,9 @@ from app.auth.chainlit_bridge import user_from_request_headers
 from app.rag.generator import generate_response
 
 logger = logging.getLogger(__name__)
+
+# Key for storing user chat history in the isolated session state
+CHAT_HISTORY_KEY = "chat_history"
 
 
 @cl.header_auth_callback
