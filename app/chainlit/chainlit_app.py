@@ -1,8 +1,10 @@
 import logging
 import os
 from typing import Dict, List, Optional
+import anyio
 import chainlit as cl
 from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
+from chainlit.input_widget import Select
 from chainlit.types import ThreadDict
 
 from app.auth.chainlit_bridge import user_from_request_headers
@@ -10,6 +12,7 @@ from app.rag.generator import generate_response
 
 logger = logging.getLogger(__name__)
 
+# Key for storing user chat history in the isolated session state
 CHAT_HISTORY_KEY = "chat_history"
 
 db_url = os.getenv("CHAINLIT_DATABASE_URL")
@@ -21,9 +24,10 @@ if db_url:
 
 @cl.header_auth_callback
 async def header_auth_callback(headers) -> Optional[cl.User]:
+    """Accept the FastAPI aka_session cookie and sync user with Supabase."""
     user = None
     try:
-        user = user_from_request_headers(headers)
+        user = await anyio.to_thread.run_sync(user_from_request_headers, headers)
     except Exception as e:
         logger.warning("user_from_request_headers error: %s", e)
 
@@ -47,25 +51,45 @@ async def header_auth_callback(headers) -> Optional[cl.User]:
 
 @cl.on_chat_start
 async def start():
+    """Triggered on brand-new chat session: define swappable models and send greeting."""
     current_user: Optional[cl.User] = cl.user_session.get("user")
     user_email = current_user.identifier if current_user else "User"
 
     cl.user_session.set(CHAT_HISTORY_KEY, [])
 
+    settings = await cl.ChatSettings(
+        [
+            Select(
+                id="Model",
+                label="AI Model",
+                values=[
+                    "gemini-3-8-flash",
+                    "groq-gpt-oss-120b",
+                    "openrouter-free",
+                    "free-fallback",
+                ],
+                initial_index=0,
+            ),
+        ]
+    ).send()
+    cl.user_session.set("settings", settings)
+
     await cl.Message(
         content=f"# Alfa Focus Knowledge Assistant\nWelcome, **{user_email}**! Ask me any accounting or business question."
     ).send()
-    print(f"=== INITIAL SETTINGS: {settings} ===")
+
+
+@cl.on_settings_update
+async def setup_agent(settings):
+    logger.info("Settings updated: %s", settings)
     cl.user_session.set("settings", settings)
 
 
 @cl.on_chat_resume
 async def on_chat_resume(thread: ThreadDict):
-
     logger.info(">>> on_chat_resume triggered for thread: %s", thread.get("id"))
     history: List[Dict[str, str]] = []
     steps = thread.get("steps", [])
-    logger.info("Steps found in thread: %d", len(steps))
 
     for step in steps:
         step_type = step.get("type")
@@ -79,30 +103,33 @@ async def on_chat_resume(thread: ThreadDict):
             history.append({"role": "assistant", "content": content})
 
     cl.user_session.set(CHAT_HISTORY_KEY, history)
+    if not cl.user_session.get("settings"):
+        cl.user_session.set("settings", {"Model": "gemini-3-8-flash"})
 
 
 @cl.on_message
 async def on_message(message: cl.Message):
-    """Store messages, maintain conversation context, and feed to generator."""
     history: List[Dict[str, str]] = cl.user_session.get(CHAT_HISTORY_KEY, [])
-
-  
     history.append({"role": "user", "content": message.content})
 
+   
+    settings = cl.user_session.get("settings") or {}
+    selected_model = settings.get("Model", "gemini-3-8-flash")
+    logger.info("Generating response with model: %s", selected_model)
+
     try:
-       
         reply_text = await cl.make_async(generate_response)(
             message.content,
             model=selected_model,
         )
 
-       
         history.append({"role": "assistant", "content": reply_text})
         cl.user_session.set(CHAT_HISTORY_KEY, history)
 
-       
+        
         msg = cl.Message(content=reply_text, parent_id=None)
         await msg.send()
 
     except Exception as e:
+        logger.exception("generate_response error: %s", e)
         await cl.Message(content=f"⚠️ error message: {str(e)}", parent_id=None).send()
