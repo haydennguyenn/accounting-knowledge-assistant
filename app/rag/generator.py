@@ -156,6 +156,7 @@ def generate_response(
     The proxy is responsible for provider selection and fallbacks.
     """
     resolved_model = model or settings.LITELLM_MODEL
+    logger.info("generate_response using model: %s", resolved_model)
 
     if not resolved_model:
         raise RuntimeError("LITELLM_MODEL is not configured.")
@@ -245,6 +246,9 @@ def generate_response_stream(
             stream=True,
             **kwargs,
         )
+        
+        print(f"=== REQUESTED MODEL: {resolved_model} ===")
+        print(f"=== ACTUAL LITELLM MODEL: {response.model} ===")
 
         for chunk in response:
             if not chunk.choices:

@@ -199,6 +199,7 @@ export function Chat() {
   const { messages } = useChatMessages()
   const { sendMessage } = useChatInteract()
   const [draft, setDraft] = useState('')
+  const [selectedModel, setSelectedModel] = useState('gemini-3-8-flash')
 
   useEffect(() => {
     let unmounted = false
@@ -238,6 +239,8 @@ export function Chat() {
     event.preventDefault()
     const content = draft.trim()
     if (!content) return
+    console.log('=== SENDING MESSAGE ===')
+    console.log('=== SELECTED MODEL ===', selectedModel)
     sendMessage(
       {
         id: crypto.randomUUID(),
@@ -245,6 +248,9 @@ export function Chat() {
         type: 'user_message',
         output: content,
         createdAt: new Date().toISOString(),
+        metadata: {
+          model: selectedModel,
+        },
       },
       [],
     )
@@ -281,6 +287,21 @@ export function Chat() {
             )
           })}
           {loading && <div className="chat-message chat-message--assistant chat-message--pending">…</div>}
+        </div>
+
+        <div className="chat-model-selector">
+          <label htmlFor="model-select">AI Model</label>
+
+          <select
+            id="model-select"
+            value={selectedModel}
+            onChange={(event) => setSelectedModel(event.target.value)}
+          >
+            <option value="gemini-3-8-flash">Gemini 3.8 Flash</option>
+            <option value="groq-gpt-oss-120b">Groq GPT-OSS 120B</option>
+            <option value="openrouter-free">OpenRouter Free</option>
+            <option value="free-fallback">Free Fallback</option>
+          </select>
         </div>
 
         <form className="chat-composer" onSubmit={handleSubmit}>
