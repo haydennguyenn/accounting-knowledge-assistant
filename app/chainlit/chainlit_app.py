@@ -55,6 +55,8 @@ async def start():
     await cl.Message(
         content=f"# Alfa Focus Knowledge Assistant\nWelcome, **{user_email}**! Ask me any accounting or business question."
     ).send()
+    print(f"=== INITIAL SETTINGS: {settings} ===")
+    cl.user_session.set("settings", settings)
 
 
 @cl.on_chat_resume
@@ -90,8 +92,8 @@ async def on_message(message: cl.Message):
     try:
        
         reply_text = await cl.make_async(generate_response)(
-            query=message.content,
-            history=history,
+            message.content,
+            model=selected_model,
         )
 
        
