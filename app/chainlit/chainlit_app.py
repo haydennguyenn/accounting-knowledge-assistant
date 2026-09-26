@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 import chainlit as cl
 import anyio
 from typing import Optional
+from chainlit.input_widget import Select
 
 from app.auth.chainlit_bridge import user_from_request_headers
 from app.rag.generator import generate_response
@@ -33,7 +34,24 @@ async def header_auth_callback(headers) -> Optional[cl.User]:
 
 @cl.on_chat_start
 async def start():
-    pass
+    print("=== CHAT START FIRED ===")
+    settings = await cl.ChatSettings(
+        [
+            Select(
+                id="Model",
+                label="AI Model",
+                values=[
+                    "gemini-3-8-flash",
+                    "groq-gpt-oss-120b",
+                    "openrouter-free",
+                    "free-fallback",
+                ],
+                initial_index=0,
+            ),
+        ]
+    ).send()
+    print(f"=== INITIAL SETTINGS: {settings} ===")
+    cl.user_session.set("settings", settings)
 
 
 @cl.on_message
@@ -41,8 +59,23 @@ async def on_message(message: cl.Message):
     logger.info("on_message fired: %s", message.content)
 
     try:
-        reply_text = await cl.make_async(generate_response)(message.content)
-        logger.info("generate_response returned: %s", reply_text[:200] if reply_text else "")
+        metadata = message.metadata or {}
+        selected_model = metadata.get("model", "gemini-3-8-flash")
+
+        logger.info("Selected model: %s", selected_model)
+        print(f"=== REQUESTED MODEL: {selected_model} ===")
+        print(f"=== ACTUAL LITELLM MODEL: {selected_model} ===")
+
+        reply_text = await cl.make_async(generate_response)(
+            message.content,
+            model=selected_model,
+        )
+
+        logger.info(
+            "generate_response returned: %s",
+            reply_text[:200] if reply_text else "",
+        )
+
     except Exception as e:
         logger.exception("generate_response error: %s", e)
         reply_text = f"⚠️ error message: {str(e)}"
