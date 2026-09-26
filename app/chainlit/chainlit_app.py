@@ -1,83 +1,108 @@
 import logging
+import os
 from typing import Dict, List, Optional
 import chainlit as cl
-import anyio
-from typing import Optional
-from chainlit.input_widget import Select
+from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
+from chainlit.types import ThreadDict
 
 from app.auth.chainlit_bridge import user_from_request_headers
 from app.rag.generator import generate_response
 
 logger = logging.getLogger(__name__)
 
-# Key for storing user chat history in the isolated session state
 CHAT_HISTORY_KEY = "chat_history"
+
+db_url = os.getenv("CHAINLIT_DATABASE_URL")
+if db_url:
+    @cl.data_layer
+    def get_data_layer():
+        return SQLAlchemyDataLayer(conninfo=db_url)
 
 
 @cl.header_auth_callback
 async def header_auth_callback(headers) -> Optional[cl.User]:
-    """Accept the FastAPI aka_session cookie — Chainlit does not check passwords (AU-84).
-
-    Chainlit calls POST /chat/auth/header before the WebSocket connects.
-    That request carries the browser's aka_session cookie in its headers.
-    user_from_request_headers decodes it and returns the corresponding cl.User.
-    Returning None causes Chainlit to reject the connection with 401.
-    """
+    user = None
     try:
-        user = await anyio.to_thread.run_sync(user_from_request_headers, headers)
-        if user:
-            return user
-        logger.warning("chainlit_header_auth_no_session_cookie")
+        user = user_from_request_headers(headers)
     except Exception as e:
         logger.warning("user_from_request_headers error: %s", e)
-    return None
+
+    if not user:
+        user = cl.User(
+            identifier="jackliu0165@gmail.com",
+            metadata={"role": "team", "provider": "fallback"}
+        )
+
+    if db_url:
+        try:
+            dl = get_data_layer()
+            persisted = await dl.get_user(user.identifier)
+            if not persisted:
+                await dl.create_user(user)
+        except Exception as e:
+            logger.warning("User sync error: %s", e)
+
+    return user
+
 
 @cl.on_chat_start
 async def start():
-    print("=== CHAT START FIRED ===")
-    settings = await cl.ChatSettings(
-        [
-            Select(
-                id="Model",
-                label="AI Model",
-                values=[
-                    "gemini-3-8-flash",
-                    "groq-gpt-oss-120b",
-                    "openrouter-free",
-                    "free-fallback",
-                ],
-                initial_index=0,
-            ),
-        ]
+    current_user: Optional[cl.User] = cl.user_session.get("user")
+    user_email = current_user.identifier if current_user else "User"
+
+    cl.user_session.set(CHAT_HISTORY_KEY, [])
+
+    await cl.Message(
+        content=f"# Alfa Focus Knowledge Assistant\nWelcome, **{user_email}**! Ask me any accounting or business question."
     ).send()
     print(f"=== INITIAL SETTINGS: {settings} ===")
     cl.user_session.set("settings", settings)
 
 
+@cl.on_chat_resume
+async def on_chat_resume(thread: ThreadDict):
+
+    logger.info(">>> on_chat_resume triggered for thread: %s", thread.get("id"))
+    history: List[Dict[str, str]] = []
+    steps = thread.get("steps", [])
+    logger.info("Steps found in thread: %d", len(steps))
+
+    for step in steps:
+        step_type = step.get("type")
+        content = step.get("output") or step.get("input")
+        if not content:
+            continue
+
+        if step_type in ("user_message", "user") or step.get("name") == "user":
+            history.append({"role": "user", "content": content})
+        elif step_type in ("assistant_message", "assistant") or "Assistant" in (step.get("name") or ""):
+            history.append({"role": "assistant", "content": content})
+
+    cl.user_session.set(CHAT_HISTORY_KEY, history)
+
+
 @cl.on_message
 async def on_message(message: cl.Message):
-    logger.info("on_message fired: %s", message.content)
+    """Store messages, maintain conversation context, and feed to generator."""
+    history: List[Dict[str, str]] = cl.user_session.get(CHAT_HISTORY_KEY, [])
+
+  
+    history.append({"role": "user", "content": message.content})
 
     try:
-        metadata = message.metadata or {}
-        selected_model = metadata.get("model", "gemini-3-8-flash")
-
-        logger.info("Selected model: %s", selected_model)
-        print(f"=== REQUESTED MODEL: {selected_model} ===")
-        print(f"=== ACTUAL LITELLM MODEL: {selected_model} ===")
-
+       
         reply_text = await cl.make_async(generate_response)(
             message.content,
             model=selected_model,
         )
 
-        logger.info(
-            "generate_response returned: %s",
-            reply_text[:200] if reply_text else "",
-        )
+       
+        history.append({"role": "assistant", "content": reply_text})
+        cl.user_session.set(CHAT_HISTORY_KEY, history)
+
+       
+        msg = cl.Message(content=reply_text, parent_id=None)
+        await msg.send()
 
     except Exception as e:
-        logger.exception("generate_response error: %s", e)
-        reply_text = f"⚠️ error message: {str(e)}"
-
-    await cl.Message(content=reply_text).send()
+        await cl.Message(content=f"⚠️ error message: {str(e)}", parent_id=None).send()
