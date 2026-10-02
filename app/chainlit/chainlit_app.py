@@ -32,10 +32,8 @@ async def header_auth_callback(headers) -> Optional[cl.User]:
         logger.warning("user_from_request_headers error: %s", e)
 
     if not user:
-        user = cl.User(
-            identifier="jackliu0165@gmail.com",
-            metadata={"role": "team", "provider": "fallback"}
-        )
+        logger.warning("Chainlit authentication failed: no authenticated FastAPI session.")
+        return None
 
     if db_url:
         try:
@@ -68,7 +66,7 @@ async def start():
                     "openrouter-free",
                     "free-fallback",
                 ],
-                initial_index=0,
+                initial_index=1,
             ),
         ]
     ).send()
@@ -104,7 +102,7 @@ async def on_chat_resume(thread: ThreadDict):
 
     cl.user_session.set(CHAT_HISTORY_KEY, history)
     if not cl.user_session.get("settings"):
-        cl.user_session.set("settings", {"Model": "gemini-3-8-flash"})
+        cl.user_session.set("settings", {"Model": "groq-gpt-oss-120b"})
 
 
 @cl.on_message
@@ -114,13 +112,22 @@ async def on_message(message: cl.Message):
 
    
     settings = cl.user_session.get("settings") or {}
-    selected_model = settings.get("Model", "gemini-3-8-flash")
+    message_metadata = message.metadata or {}
+
+    selected_model = (
+        message_metadata.get("model")
+        or settings.get("Model")
+        or "groq-gpt-oss-120b"
+    )
+
     logger.info("Generating response with model: %s", selected_model)
 
     try:
         reply_text = await cl.make_async(generate_response)(
             message.content,
             model=selected_model,
+            timeout=120,
+            max_tokens=1200,
         )
 
         history.append({"role": "assistant", "content": reply_text})
