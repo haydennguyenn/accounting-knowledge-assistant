@@ -22,23 +22,23 @@ export function Sidebar() {
       .catch((err) => console.error('Error fetching threads:', err))
   }, [currentThreadId])
 
-  // --- 重命名功能逻辑 ---
+  
   const handleRenameThread = async (e: MouseEvent, threadId: string, currentName: string) => {
-    e.stopPropagation() // 阻止点击触发会话跳转
+    e.stopPropagation() 
 
     const newName = window.prompt('Enter new conversation title (max 50 chars):', currentName)
     if (newName === null) {
-      return // 用户点击了取消
+      return 
     }
 
     const trimmed = newName.trim()
-    // 校验 1：不能为空
+    
     if (!trimmed) {
       alert('Conversation title cannot be empty.')
       return
     }
 
-    // 校验 2：不能超过 50 个字符
+    
     if (trimmed.length > 50) {
       alert(`Conversation title cannot exceed 50 characters. (Current: ${trimmed.length})`)
       return
@@ -53,7 +53,7 @@ export function Sidebar() {
       })
 
       if (res.ok) {
-        // 即时更新本地列表显示，无需重新拉取
+       
         setThreads((prev) =>
           prev.map((t) => (t.id === threadId ? { ...t, name: trimmed } : t))
         )
@@ -67,7 +67,6 @@ export function Sidebar() {
     }
   }
 
-  // --- 删除功能逻辑 ---
   const handleDeleteThread = async (e: MouseEvent, threadId: string) => {
     e.stopPropagation()
 
@@ -169,7 +168,6 @@ export function Sidebar() {
                   </span>
                 </div>
 
-                {/* 操作按钮区：编辑 + 删除 */}
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: '4px' }}>
                   <button
                     type="button"

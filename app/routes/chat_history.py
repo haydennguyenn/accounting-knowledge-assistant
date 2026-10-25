@@ -182,21 +182,21 @@ def rename_thread(
 
     new_name = payload.name.strip()
 
-    # 1. 校验：名称不能为空
+    
     if not new_name:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Conversation title cannot be empty.",
         )
 
-    # 2. 校验：不能超过 50 个字符
+    
     if len(new_name) > 50:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Conversation title cannot exceed 50 characters (current length: {len(new_name)}).",
         )
 
-    # 3. 校验所有权并更新
+    
     thread = db.execute(
         text("""
             SELECT id, "userIdentifier" FROM threads
